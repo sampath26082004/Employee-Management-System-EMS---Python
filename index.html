@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management System</title>
+    <style>
+        /* Basic reset for consistent layout */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Container for everything */
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Action menu buttons */
+        .action-menu {
+            display: flex;
+            justify-content: space-evenly;
+            margin-bottom: 20px;
+        }
+
+        .action-menu button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .action-menu button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Hide forms initially */
+        .employee-form {
+            margin-top: 20px;
+        }
+
+        .employee-form input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .employee-form button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .employee-form button:hover {
+            background-color: #218838;
+        }
+
+        /* Table styling */
+        #employee-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        #employee-table th, #employee-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #employee-table th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        /* Show table */
+        #employee-list {
+            margin-top: 20px;
+        }
+
+        /* Transition for showing and hiding forms */
+        .hidden {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Employee Management System</h1>
+        
+        <!-- Menu for actions -->
+        <div class="action-menu">
+            <button onclick="showForm('add')">Add Employee</button>
+            <button onclick="showForm('remove')">Remove Employee</button>
+            <button onclick="showForm('update')">Update Employee</button>
+            <button onclick="showForm('search')">Search Employee</button>
+            <button onclick="showEmployeeList()">List All Employees</button>
+        </div>
+        
+        <!-- Form for adding employee -->
+        <div id="add-form" class="employee-form hidden">
+            <h2>Add Employee</h2>
+            <input type="number" id="add-emp-id" placeholder="Employee ID" required>
+            <input type="text" id="add-name" placeholder="Name" required>
+            <input type="text" id="add-position" placeholder="Position" required>
+            <input type="number" id="add-salary" placeholder="Salary" required>
+            <button onclick="addEmployee()">Add Employee</button>
+        </div>
+        
+        <!-- Form for removing employee -->
+        <div id="remove-form" class="employee-form hidden">
+            <h2>Remove Employee</h2>
+            <input type="number" id="remove-emp-id" placeholder="Employee ID" required>
+            <button onclick="removeEmployee()">Remove Employee</button>
+        </div>
+        
+        <!-- Form for updating employee -->
+        <div id="update-form" class="employee-form hidden">
+            <h2>Update Employee</h2>
+            <input type="number" id="update-emp-id" placeholder="Employee ID" required>
+            <input type="text" id="update-name" placeholder="New Name">
+            <input type="text" id="update-position" placeholder="New Position">
+            <input type="number" id="update-salary" placeholder="New Salary">
+            <button onclick="updateEmployee()">Update Employee</button>
+        </div>
+        
+        <!-- Form for searching employee -->
+        <div id="search-form" class="employee-form hidden">
+            <h2>Search Employee</h2>
+            <input type="number" id="search-emp-id" placeholder="Employee ID" required>
+            <button onclick="searchEmployee()">Search Employee</button>
+        </div>
+        
+        <!-- List of employees -->
+        <div id="employee-list" class="hidden">
+            <h2>All Employees</h2>
+            <table id="employee-table">
+                <thead>
+                    <tr>
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Salary</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Array to store employees
+        let employees = [];
+
+        // Show the relevant form based on action
+        function showForm(action) {
+            const forms = document.querySelectorAll('.employee-form');
+            forms.forEach(form => form.classList.add('hidden'));
+
+            document.getElementById(`${action}-form`).classList.remove('hidden');
+        }
+
+        // Show the list of employees in the table
+        function showEmployeeList() {
+            const employeeList = document.getElementById('employee-list');
+            const employeeTableBody = document.querySelector('#employee-table tbody');
+
+            employeeList.classList.remove('hidden');
+
+            // Clear existing rows
+            employeeTableBody.innerHTML = '';
+
+            // Add employees to the table
+            employees.forEach(employee => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${employee.employee_id}</td>
+                    <td>${employee.name}</td>
+                    <td>${employee.position}</td>
+                    <td>${employee.salary}</td>
+                `;
+                employeeTableBody.appendChild(row);
+            });
+        }
+
+        // Add a new employee
+        function addEmployee() {
+            const id = document.getElementById('add-emp-id').value;
+            const name = document.getElementById('add-name').value;
+            const position = document.getElementById('add-position').value;
+            const salary = document.getElementById('add-salary').value;
+
+            // Add employee to the array
+            employees.push({ employee_id: id, name: name, position: position, salary: salary });
+
+            alert('Employee added successfully!');
+            showEmployeeList();
+            clearForm('add');
+        }
+
+        // Remove an employee
+        function removeEmployee() {
+            const id = document.getElementById('remove-emp-id').value;
+
+            // Filter out the employee with the given ID
+            employees = employees.filter(employee => employee.employee_id !== id);
+
+            alert('Employee removed successfully!');
+            showEmployeeList();
+            clearForm('remove');
+        }
+
+        // Update an employee's details
+        function updateEmployee() {
+            const id = document.getElementById('update-emp-id').value;
+            const name = document.getElementById('update-name').value;
+            const position = document.getElementById('update-position').value;
+            const salary = document.getElementById('update-salary').value;
+
+            const employee = employees.find(employee => employee.employee_id === id);
+
+            if (employee) {
+                if (name) employee.name = name;
+                if (position) employee.position = position;
+                if (salary) employee.salary = salary;
+
+                alert('Employee updated successfully!');
+                showEmployeeList();
+                clearForm('update');
+            } else {
+                alert('Employee not found!');
+            }
+        }
+
+        // Search for an employee by ID
+        function searchEmployee() {
+            const id = document.getElementById('search-emp-id').value;
+
+            const employee = employees.find(employee => employee.employee_id === id);
+
+            if (employee) {
+                alert(`Employee Found: \nName: ${employee.name}\nPosition: ${employee.position}\nSalary: ${employee.salary}`);
+            } else {
+                alert('Employee not found!');
+            }
+
+            clearForm('search');
+        }
+
+        // Clear form inputs after submission
+        function clearForm(action) {
+            const form = document.getElementById(`${action}-form`);
+            form.querySelectorAll('input').forEach(input => input.value = '');
+        }
+    </script>
+</body>
+</html>
